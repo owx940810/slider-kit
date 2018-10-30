@@ -1,22 +1,7 @@
 /* eslint no-new: "off", no-unused-vars: "off" */
 
-let kit
-let wrapper
-let items
-
-const slider = {
-  state: {
-    touch: false,
-    movement: false
-  },
-  startX: 0,
-  startY: 0,
-  position: 0,
-  end: 0,
-  index: 0,
-  max: 0,
-  width: 0,
-  maxposition: 0
+const kit = {
+  sliders: []
 }
 
 class Sliderkit {
@@ -26,57 +11,78 @@ class Sliderkit {
   }
 
   getElements () {
-    kit = window['slider-kit']
+    kit.sliders = [...(document.querySelectorAll('.slider-kit'))].map((slider, index) => {
+      let wrapper = slider.querySelector('.slider-wrapper')
+      if (!wrapper) {
+        throw new Error(`couldn't find slider-wrapper in slider-kit no.${index}`)
+      }
 
-    if (!kit) {
-      new Error('slider-kit not found')
-    }
+      let itemsWrapper = wrapper.querySelector('.slider-items')
+      if (!itemsWrapper) {
+        throw new Error(`couldn't find slider-items in slider-kit no.${index}`)
+      }
 
-    wrapper = kit.querySelector('.slider-wrapper')
+      let items = wrapper.querySelectorAll('.slider-item')
+      if (items.length < 0) {
+        throw new Error(`couldn't find slider-item in slider-kit no.${index}`)
+      }
 
-    if (!wrapper) {
-      new Error('slider-wrapper not found')
-    }
+      return {
+        ele: slider,
+        wrapper: wrapper,
+        itemsWrapper: itemsWrapper,
+        items: items,
+        width: items[0].offsetWidth,
+        max: items.length - 1,
+        position: 0,
+        end: 0,
+        index: 0,
+        maxposition: 0,
+        state: {
+          touch: false,
+          movement: false
+        },
+        startX: 0,
+        startY: 0
+      }
+    })
 
-    items = wrapper.querySelectorAll('.slider-item')
-
-    if (items.length < 0) {
-      new Error('no slider-items found')
+    if (kit.sliders.length <= 0) {
+      throw new Error('no slider-kit found')
     }
   }
 
   init () {
-    slider.width = items[0].offsetWidth
-    slider.max = items.length - 1
+    kit.sliders.map(slider => {
+      let marginleft = window.getComputedStyle(slider.items[0])['margin-left']
+      if (marginleft) {
+        slider.width += parseInt(marginleft.substring(0, marginleft.length - 2))
+      }
 
-    let marginleft = window.getComputedStyle(items[0])['margin-left']
-    if (marginleft) {
-      slider.width += parseInt(marginleft.substring(0, marginleft.length - 2))
-    }
+      let marginright = window.getComputedStyle(slider.items[0])['margin-right']
+      if (marginright) {
+        slider.width += parseInt(marginright.substring(0, marginright.length - 2))
+      }
 
-    let marginright = window.getComputedStyle(items[0])['margin-right']
-    if (marginright) {
-      slider.width += parseInt(marginright.substring(0, marginright.length - 2))
-    }
+      if (slider.max * slider.width > slider.wrapper.offsetWidth) {
+        slider.maxposition = (slider.max * slider.width) - (slider.wrapper.offsetWidth - slider.width)
+      }
 
-    if (slider.max * slider.width > wrapper.offsetWidth) {
-      slider.maxposition = (slider.max * slider.width) - (wrapper.offsetWidth - slider.width)
-    }
-
-    if (navigator.userAgent.toLocaleLowerCase().indexOf('mobile') >= 0) {
-      kit.addEventListener('touchstart', event => this.start(event), { passive: false })
-      window.addEventListener('touchmove', event => this.move(event), { passive: false })
-      window.addEventListener('touchend', event => this.end(event), { passive: false })
-    } else {
-      kit.addEventListener('mousedown', event => this.start(event))
-      window.addEventListener('mousemove', event => this.move(event))
-      window.addEventListener('mouseup', event => this.end(event))
-    }
+      if (navigator.userAgent.toLocaleLowerCase().indexOf('mobile') >= 0) {
+        slider.ele.addEventListener('touchstart', event => this.start(event, slider), { passive: false })
+        window.addEventListener('touchmove', event => this.move(event, slider), { passive: false })
+        window.addEventListener('touchend', event => this.end(slider), { passive: false })
+      } else {
+        slider.ele.addEventListener('mousedown', event => this.start(event, slider))
+        window.addEventListener('mousemove', event => this.move(event, slider))
+        window.addEventListener('mouseup', event => this.end(slider))
+      }
+    })
   }
 
-  start (event) {
+  start (event, slider) {
     slider.state.touch = true
-    wrapper.style.transition = ''
+    slider.itemsWrapper.style.transition = ''
     slider.state.movement = false
 
     slider.startX = event.clientX || event.touches[0].clientX
@@ -85,7 +91,7 @@ class Sliderkit {
     }
   }
 
-  move (event) {
+  move (event, slider) {
     if (!slider.state.touch) {
       return
     }
@@ -107,10 +113,10 @@ class Sliderkit {
     event.preventDefault()
     slider.state.movement = true
     slider.position = slider.end - slider.startX + clientX
-    wrapper.style.transform = `translateX(${slider.position}px)`
+    slider.itemsWrapper.style.transform = `translateX(${slider.position}px)`
   }
 
-  end () {
+  end (slider) {
     if (!slider.state.touch) {
       return
     }
@@ -121,17 +127,17 @@ class Sliderkit {
     }
 
     slider.state.touch = false
-    this.bounce()
+    this.bounce(slider)
   }
 
-  bounce (index) {
+  bounce (slider, index) {
     if (index === undefined) {
       slider.index = -(Math.round(slider.position / slider.width))
     } else {
       slider.index = index
     }
 
-    wrapper.style.transition = 'transform 250ms ease-in-out'
+    slider.itemsWrapper.style.transition = 'transform 250ms ease-in-out'
 
     if (slider.index < 0) {
       slider.index = 0
@@ -146,7 +152,7 @@ class Sliderkit {
     }
 
     slider.end = slider.position = tempposition
-    wrapper.dataset.sliderindex = slider.index
-    wrapper.style.transform = `translateX(${slider.position}px)`
+    slider.wrapper.dataset.sliderindex = slider.index
+    slider.itemsWrapper.style.transform = `translateX(${slider.position}px)`
   }
 }

@@ -1,0 +1,59 @@
+// media query
+$mobile: 640px
+$tablet: 1023px
+$desktop: 1024px
+
+// speed
+$speed-very-fast: 100ms ease-in-out
+$speed-fast: 200ms ease-in-out
+$speed-normal: 300ms ease-in-out
+$speed-slow: 400ms ease-in-out
+$speed-very-slow: 500ms ease-in-out
+
+// mixins
+=mobile
+  @media screen and (max-width: $mobile)
+    @content
+
+=tablet
+  @media screen and (max-width: $tablet)
+    @content
+
+=from-tablet
+  @media screen and (min-width: $mobile + 1px)
+    @content
+
+=desktop
+  @media screen and (min-width: $desktop)
+    @content
+
+.slider-kit
+  .slider-wrapper
+    width: 100%
+    overflow: hidden
+
+  .slider-items
+    display: flex
+    flex-flow: row nowrap
+    justify-content: flex-start
+    +mobile
+      align-items: stretch
+
+    .slider-item
+      display: block
+      text-decoration: none
+      flex: 0 0 100%
+      max-width: 100%
+      transition: transform $speed-fast
+      cursor: pointer
+
+      img
+        width: 100%
+        max-width: 100%
+
+    &.hover-scale
+      .slider-item
+        &:hover
+          +from-tablet
+            transform: scale(1.1)
+
