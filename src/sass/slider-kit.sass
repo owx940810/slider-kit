@@ -27,10 +27,85 @@ $speed-very-slow: 500ms ease-in-out
   @media screen and (min-width: $desktop)
     @content
 
+*
+  box-sizing: border-box
+
+body
+  margin: 0
+
 .slider-kit
+  *
+    box-sizing: border-box
+
   .slider-wrapper
+    position: relative
     width: 100%
     overflow: hidden
+
+    > button
+      width: 40px
+      height: 40px
+      position: absolute
+      top: 50%
+      transform: translateY(-50%)
+      border: 0
+      border-radius: 50%
+      outline: none
+      cursor: pointer
+      box-shadow: 0 0 10px rgba(0,0,0,0.2)
+      background-position: center
+      background-size: contain
+      background-repeat: no-repeat
+      background-color: #fff
+      -webkit-tap-highlight-color: rgba(0,0,0,0)
+      opacity: 0
+      transition: all $speed-fast
+
+      +mobile
+        width: 30px
+        height: 30px
+
+      &.slider-button-left
+        left: 20px
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='48' height='48' viewBox='0 0 48 48' fill='transparent'><circle cx='24' cy='24' r='24' /><polyline points='28,16 18,24 28,32' style='fill:none ;stroke:#000000; stroke-width:2; stroke-linecap:round' /></svg>")
+        +mobile
+          left: 10px
+
+      &.slider-button-right
+        right: 20px
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='48' height='48' viewBox='0 0 48 48' fill='transparent'><circle cx='24' cy='24' r='24' /><polyline points='20,16 30,24 20,32' style='fill:none ;stroke:#000000; stroke-width:2; stroke-linecap:round' /></svg>")
+        +mobile
+          right: 10px
+
+    > .slider-paginations
+      width: 100%
+      position: absolute
+      bottom: 20px
+      display: flex
+      flex-flow: row nowrap
+      justify-content: center
+
+      .slider-page
+        width: 10px
+        height: 10px
+        border-radius: 50%
+        box-shadow: 0 0 10px rgba(0,0,0,0.2)
+        opacity: 0.5
+        background-color: #fff
+        margin: 5px
+        cursor: pointer
+        transition: all $speed-very-fast
+
+        &:hover
+          opacity: 1
+
+        &.active
+          opacity: 1
+          transform: scale(1.5)
+
+    &:hover
+      button
+        opacity: 1
 
   .slider-items
     display: flex
@@ -56,4 +131,3 @@ $speed-very-slow: 500ms ease-in-out
         &:hover
           +from-tablet
             transform: scale(1.1)
-

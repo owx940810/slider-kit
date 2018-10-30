@@ -6,8 +6,11 @@ const kit = {
 
 class Sliderkit {
   constructor () {
-    this.getElements()
-    this.init()
+    // to cater for scrollbar width
+    setTimeout(() => {
+      this.getElements()
+      this.init()
+    }, 200)
   }
 
   getElements () {
@@ -27,6 +30,31 @@ class Sliderkit {
         throw new Error(`couldn't find slider-item in slider-kit no.${index}`)
       }
 
+      let buttonleft = wrapper.querySelector('button.slider-button-left')
+      let buttonright = wrapper.querySelector('button.slider-button-right')
+
+      let buttons = {}
+      if (buttonleft && buttonright) {
+        buttons = {
+          left: buttonleft,
+          right: buttonright
+        }
+      }
+
+      let paginations = wrapper.querySelector('.slider-paginations')
+      if (paginations) {
+        ;[...(items)].map((item, index) => {
+          let ele = document.createElement('div')
+          ele.classList.add('slider-page')
+
+          if (index === 0) {
+            ele.classList.add('active')
+          }
+
+          paginations.appendChild(ele)
+        })
+      }
+
       return {
         ele: slider,
         wrapper: wrapper,
@@ -43,12 +71,26 @@ class Sliderkit {
           movement: false
         },
         startX: 0,
-        startY: 0
+        startY: 0,
+        button: buttons,
+        paginations: paginations
       }
     })
 
     if (kit.sliders.length <= 0) {
       throw new Error('no slider-kit found')
+    }
+  }
+
+  setEventListeners (slider) {
+    if (navigator.userAgent.toLocaleLowerCase().indexOf('mobile') >= 0) {
+      slider.ele.addEventListener('touchstart', event => this.start(event, slider), { passive: false })
+      window.addEventListener('touchmove', event => this.move(event, slider), { passive: false })
+      window.addEventListener('touchend', event => this.end(slider), { passive: false })
+    } else {
+      slider.ele.addEventListener('mousedown', event => this.start(event, slider))
+      window.addEventListener('mousemove', event => this.move(event, slider))
+      window.addEventListener('mouseup', event => this.end(slider))
     }
   }
 
@@ -68,19 +110,37 @@ class Sliderkit {
         slider.maxposition = (slider.max * slider.width) - (slider.wrapper.offsetWidth - slider.width)
       }
 
-      if (navigator.userAgent.toLocaleLowerCase().indexOf('mobile') >= 0) {
-        slider.ele.addEventListener('touchstart', event => this.start(event, slider), { passive: false })
-        window.addEventListener('touchmove', event => this.move(event, slider), { passive: false })
-        window.addEventListener('touchend', event => this.end(slider), { passive: false })
-      } else {
-        slider.ele.addEventListener('mousedown', event => this.start(event, slider))
-        window.addEventListener('mousemove', event => this.move(event, slider))
-        window.addEventListener('mouseup', event => this.end(slider))
+      this.setEventListeners(slider)
+
+      if (slider.button.left) {
+        slider.button.left.addEventListener('click', () => {
+          slider.index--
+          this.bounce(slider, slider.index)
+        })
+      }
+      if (slider.button.right) {
+        slider.button.right.addEventListener('click', () => {
+          slider.index++
+          this.bounce(slider, slider.index)
+        })
+      }
+
+      if (slider.paginations) {
+        ;[...(slider.paginations.children)].map((page, index) => {
+          page.addEventListener('click', () => {
+            this.bounce(slider, index)
+            this.setPagination(slider, index)
+          })
+        })
       }
     })
   }
 
   start (event, slider) {
+    if (event.target.tagName === 'button' || event.target.classList.contains('slider-page')) {
+      event.preventDefault()
+      return
+    }
     slider.state.touch = true
     slider.itemsWrapper.style.transition = ''
     slider.state.movement = false
@@ -130,13 +190,20 @@ class Sliderkit {
     this.bounce(slider)
   }
 
+  setPagination (slider, index) {
+    if (!slider.paginations) {
+      return
+    }
+    slider.paginations.querySelector('.active').classList.remove('active')
+    slider.paginations.children[index].classList.add('active')
+  }
+
   bounce (slider, index) {
     if (index === undefined) {
       slider.index = -(Math.round(slider.position / slider.width))
     } else {
       slider.index = index
     }
-
     slider.itemsWrapper.style.transition = 'transform 250ms ease-in-out'
 
     if (slider.index < 0) {
@@ -154,5 +221,6 @@ class Sliderkit {
     slider.end = slider.position = tempposition
     slider.wrapper.dataset.sliderindex = slider.index
     slider.itemsWrapper.style.transform = `translateX(${slider.position}px)`
+    this.setPagination(slider, slider.index)
   }
 }
