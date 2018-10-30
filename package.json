@@ -7,7 +7,10 @@
   "author": "calvin <calvinxhen@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "lint:js": "standard -v ./src/js/**/*.js"
+    "lint:js": "standard -v ./src/js/**/*.js",
+    "build": "gulp",
+    "watch": "gulp watch",
+    "serve": "serve -l 3000 ./example"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",
@@ -15,9 +18,11 @@
     "gulp": "^4.0.0",
     "gulp-autoprefixer": "^6.0.0",
     "gulp-babel": "^8.0.0",
+    "gulp-pug": "^4.0.1",
     "gulp-rename": "^1.4.0",
     "gulp-sass": "^4.0.2",
     "gulp-uglify": "^3.0.1",
+    "serve": "^10.0.2",
     "standard": "^12.0.1"
   }
 }
