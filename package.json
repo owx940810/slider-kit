@@ -1,0 +1,23 @@
+{
+  "name": "slider-kit",
+  "version": "1.0.0",
+  "description": "responsive and touch-enabled slider plugin",
+  "main": "index.js",
+  "repository": "https://github.com/owx940810/slider-kit.git",
+  "author": "calvin <calvinxhen@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "lint:js": "standard -v ./src/js/**/*.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "gulp": "^4.0.0",
+    "gulp-autoprefixer": "^6.0.0",
+    "gulp-babel": "^8.0.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-uglify": "^3.0.1",
+    "standard": "^12.0.1"
+  }
+}
