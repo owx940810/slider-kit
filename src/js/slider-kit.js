@@ -86,12 +86,20 @@ class Sliderkit {
     if (navigator.userAgent.toLocaleLowerCase().indexOf('mobile') >= 0) {
       slider.ele.addEventListener('touchstart', event => this.start(event, slider), { passive: false })
       window.addEventListener('touchmove', event => this.move(event, slider), { passive: false })
-      window.addEventListener('touchend', event => this.end(slider), { passive: false })
+      window.addEventListener('touchend', event => this.end(event, slider), { passive: false })
     } else {
       slider.ele.addEventListener('mousedown', event => this.start(event, slider))
       window.addEventListener('mousemove', event => this.move(event, slider))
-      window.addEventListener('mouseup', event => this.end(slider))
+      window.addEventListener('mouseup', event => this.end(event, slider))
     }
+
+    [...(slider.items)].map(item => {
+      item.addEventListener('click', e => {
+        if (slider.itemsWrapper.style.cssText.indexOf('transition') >= 0) {
+          e.preventDefault()
+        }
+      })
+    })
   }
 
   init () {
@@ -176,9 +184,13 @@ class Sliderkit {
     slider.itemsWrapper.style.transform = `translateX(${slider.position}px)`
   }
 
-  end (slider) {
+  end (event, slider) {
     if (!slider.state.touch) {
       return
+    }
+
+    if (slider.state.movement) {
+      event.preventDefault()
     }
 
     if (Math.floor(slider.position) === Math.floor(slider.end)) {

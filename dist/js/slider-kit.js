@@ -128,7 +128,7 @@ function () {
           passive: false
         });
         window.addEventListener('touchend', function (event) {
-          return _this2.end(slider);
+          return _this2.end(event, slider);
         }, {
           passive: false
         });
@@ -140,9 +140,17 @@ function () {
           return _this2.move(event, slider);
         });
         window.addEventListener('mouseup', function (event) {
-          return _this2.end(slider);
+          return _this2.end(event, slider);
         });
       }
+
+      _toConsumableArray(slider.items).map(function (item) {
+        item.addEventListener('click', function (e) {
+          if (slider.itemsWrapper.style.cssText.indexOf('transition') >= 0) {
+            e.preventDefault();
+          }
+        });
+      });
     }
   }, {
     key: "init",
@@ -244,9 +252,13 @@ function () {
     }
   }, {
     key: "end",
-    value: function end(slider) {
+    value: function end(event, slider) {
       if (!slider.state.touch) {
         return;
+      }
+
+      if (slider.state.movement) {
+        event.preventDefault();
       }
 
       if (Math.floor(slider.position) === Math.floor(slider.end)) {
