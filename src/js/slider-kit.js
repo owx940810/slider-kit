@@ -5,76 +5,81 @@ const kit = {
 }
 
 class Sliderkit {
-  constructor () {
-    // to cater for scrollbar width
-    setTimeout(() => {
+  constructor (element) {
+    if (!arguments.length) {
       this.getElements()
-      this.init()
-    }, 200)
+    } else {
+      kit.sliders.push(this.getSlider(element))
+    }
+    this.init()
+  }
+
+  getSlider (element) {
+    let wrapper = element.querySelector('.slider-wrapper')
+    if (!wrapper) {
+      throw new Error(`couldn't find slider-wrapper in slider-kit no.${index}`)
+    }
+
+    let itemsWrapper = wrapper.querySelector('.slider-items')
+    if (!itemsWrapper) {
+      throw new Error(`couldn't find slider-items in slider-kit no.${index}`)
+    }
+
+    let items = wrapper.querySelectorAll('.slider-item')
+    if (items.length < 0) {
+      throw new Error(`couldn't find slider-item in slider-kit no.${index}`)
+    }
+
+    let buttonleft = wrapper.querySelector('button.slider-button-left')
+    let buttonright = wrapper.querySelector('button.slider-button-right')
+
+    let buttons = {}
+    if (buttonleft && buttonright) {
+      buttons = {
+        left: buttonleft,
+        right: buttonright
+      }
+    }
+
+    let paginations = wrapper.querySelector('.slider-paginations')
+    if (paginations) {
+      ;[...(items)].map((item, index) => {
+        let ele = document.createElement('div')
+        ele.classList.add('slider-page')
+
+        if (index === 0) {
+          ele.classList.add('active')
+        }
+
+        paginations.appendChild(ele)
+      })
+    }
+
+    return {
+      ele: element,
+      wrapper: wrapper,
+      itemsWrapper: itemsWrapper,
+      items: items,
+      width: items[0].offsetWidth,
+      max: items.length - 1,
+      position: 0,
+      end: 0,
+      index: 0,
+      maxposition: 0,
+      state: {
+        touch: false,
+        movement: false
+      },
+      startX: 0,
+      startY: 0,
+      button: buttons,
+      paginations: paginations
+    }
   }
 
   getElements () {
     kit.sliders = [...(document.querySelectorAll('.slider-kit'))].map((slider, index) => {
-      let wrapper = slider.querySelector('.slider-wrapper')
-      if (!wrapper) {
-        throw new Error(`couldn't find slider-wrapper in slider-kit no.${index}`)
-      }
-
-      let itemsWrapper = wrapper.querySelector('.slider-items')
-      if (!itemsWrapper) {
-        throw new Error(`couldn't find slider-items in slider-kit no.${index}`)
-      }
-
-      let items = wrapper.querySelectorAll('.slider-item')
-      if (items.length < 0) {
-        throw new Error(`couldn't find slider-item in slider-kit no.${index}`)
-      }
-
-      let buttonleft = wrapper.querySelector('button.slider-button-left')
-      let buttonright = wrapper.querySelector('button.slider-button-right')
-
-      let buttons = {}
-      if (buttonleft && buttonright) {
-        buttons = {
-          left: buttonleft,
-          right: buttonright
-        }
-      }
-
-      let paginations = wrapper.querySelector('.slider-paginations')
-      if (paginations) {
-        ;[...(items)].map((item, index) => {
-          let ele = document.createElement('div')
-          ele.classList.add('slider-page')
-
-          if (index === 0) {
-            ele.classList.add('active')
-          }
-
-          paginations.appendChild(ele)
-        })
-      }
-
-      return {
-        ele: slider,
-        wrapper: wrapper,
-        itemsWrapper: itemsWrapper,
-        items: items,
-        width: items[0].offsetWidth,
-        max: items.length - 1,
-        position: 0,
-        end: 0,
-        index: 0,
-        maxposition: 0,
-        state: {
-          touch: false,
-          movement: false
-        },
-        startX: 0,
-        startY: 0,
-        button: buttons,
-        paginations: paginations
-      }
+      return this.getSlider(slider)
     })
 
     if (kit.sliders.length <= 0) {
@@ -152,7 +157,6 @@ class Sliderkit {
     slider.state.touch = true
     slider.itemsWrapper.style.transition = ''
     slider.state.movement = false
-
     slider.startX = event.clientX || event.touches[0].clientX
     if (event.type === 'touchstart') {
       slider.startY = event.touches[0].clientY
@@ -164,7 +168,12 @@ class Sliderkit {
       return
     }
 
-    let clientX = event.clientX || event.touches[0].clientX
+    let clientX
+    if (event.type === 'mousemove') {
+      clientX = event.clientX
+    } else {
+      clientX = event.touches[0].clientX
+    }
 
     if (!slider.state.movement) {
       let clientY = 0
