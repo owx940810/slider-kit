@@ -22,89 +22,95 @@ var kit = {
 var Sliderkit =
 /*#__PURE__*/
 function () {
-  function Sliderkit() {
-    var _this = this;
-
+  function Sliderkit(element) {
     _classCallCheck(this, Sliderkit);
 
-    // to cater for scrollbar width
-    setTimeout(function () {
-      _this.getElements();
+    if (!arguments.length) {
+      this.getElements();
+    } else {
+      kit.sliders.push(this.getSlider(element));
+    }
 
-      _this.init();
-    }, 200);
+    this.init();
   }
 
   _createClass(Sliderkit, [{
+    key: "getSlider",
+    value: function getSlider(element) {
+      var wrapper = element.querySelector('.slider-wrapper');
+
+      if (!wrapper) {
+        throw new Error("couldn't find slider-wrapper in slider-kit no.".concat(index));
+      }
+
+      var itemsWrapper = wrapper.querySelector('.slider-items');
+
+      if (!itemsWrapper) {
+        throw new Error("couldn't find slider-items in slider-kit no.".concat(index));
+      }
+
+      var items = wrapper.querySelectorAll('.slider-item');
+
+      if (items.length < 0) {
+        throw new Error("couldn't find slider-item in slider-kit no.".concat(index));
+      }
+
+      var buttonleft = wrapper.querySelector('button.slider-button-left');
+      var buttonright = wrapper.querySelector('button.slider-button-right');
+      var buttons = {};
+
+      if (buttonleft && buttonright) {
+        buttons = {
+          left: buttonleft,
+          right: buttonright
+        };
+      }
+
+      var paginations = wrapper.querySelector('.slider-paginations');
+
+      if (paginations) {
+        ;
+
+        _toConsumableArray(items).map(function (item, index) {
+          var ele = document.createElement('div');
+          ele.classList.add('slider-page');
+
+          if (index === 0) {
+            ele.classList.add('active');
+          }
+
+          paginations.appendChild(ele);
+        });
+      }
+
+      return {
+        ele: element,
+        wrapper: wrapper,
+        itemsWrapper: itemsWrapper,
+        items: items,
+        width: items[0].offsetWidth,
+        max: items.length - 1,
+        position: 0,
+        end: 0,
+        index: 0,
+        maxposition: 0,
+        state: {
+          touch: false,
+          movement: false
+        },
+        startX: 0,
+        startY: 0,
+        button: buttons,
+        paginations: paginations
+      };
+    }
+  }, {
     key: "getElements",
     value: function getElements() {
+      var _this = this;
+
       kit.sliders = _toConsumableArray(document.querySelectorAll('.slider-kit')).map(function (slider, index) {
-        var wrapper = slider.querySelector('.slider-wrapper');
-
-        if (!wrapper) {
-          throw new Error("couldn't find slider-wrapper in slider-kit no.".concat(index));
-        }
-
-        var itemsWrapper = wrapper.querySelector('.slider-items');
-
-        if (!itemsWrapper) {
-          throw new Error("couldn't find slider-items in slider-kit no.".concat(index));
-        }
-
-        var items = wrapper.querySelectorAll('.slider-item');
-
-        if (items.length < 0) {
-          throw new Error("couldn't find slider-item in slider-kit no.".concat(index));
-        }
-
-        var buttonleft = wrapper.querySelector('button.slider-button-left');
-        var buttonright = wrapper.querySelector('button.slider-button-right');
-        var buttons = {};
-
-        if (buttonleft && buttonright) {
-          buttons = {
-            left: buttonleft,
-            right: buttonright
-          };
-        }
-
-        var paginations = wrapper.querySelector('.slider-paginations');
-
-        if (paginations) {
-          ;
-
-          _toConsumableArray(items).map(function (item, index) {
-            var ele = document.createElement('div');
-            ele.classList.add('slider-page');
-
-            if (index === 0) {
-              ele.classList.add('active');
-            }
-
-            paginations.appendChild(ele);
-          });
-        }
-
-        return {
-          ele: slider,
-          wrapper: wrapper,
-          itemsWrapper: itemsWrapper,
-          items: items,
-          width: items[0].offsetWidth,
-          max: items.length - 1,
-          position: 0,
-          end: 0,
-          index: 0,
-          maxposition: 0,
-          state: {
-            touch: false,
-            movement: false
-          },
-          startX: 0,
-          startY: 0,
-          button: buttons,
-          paginations: paginations
-        };
+        return _this.getSlider(slider);
       });
 
       if (kit.sliders.length <= 0) {
@@ -229,7 +235,13 @@ function () {
         return;
       }
 
-      var clientX = event.clientX || event.touches[0].clientX;
+      var clientX;
+
+      if (event.type === 'mousemove') {
+        clientX = event.clientX;
+      } else {
+        clientX = event.touches[0].clientX;
+      }
 
       if (!slider.state.movement) {
         var clientY = 0;
