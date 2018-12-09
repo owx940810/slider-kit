@@ -4,10 +4,12 @@ head
   meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no, minimal-ui")
   title Slider Kit Example
   link(rel="stylesheet" href="css/slider-kit.css")
+  Link(rel="stylesheet" href="https://sass-template.calvinong.tech/css/common.css")
   script(src="js/slider-kit.js")
 body
   #app
-    #test.slider-kit
+    h2 Slider, Buttons, Pagination
+    .slider-kit
       .slider-wrapper
         .slider-items
           a.slider-item(href="http://google.com")
@@ -23,6 +25,7 @@ body
         .slider-paginations
 
     br
+    h2 Slider, Pagination
     .slider-kit
       .slider-wrapper
         .slider-items
@@ -37,6 +40,7 @@ body
         .slider-paginations
 
     br
+    h2 Slider
     .slider-kit
       .slider-wrapper
         .slider-items
@@ -48,5 +52,27 @@ body
             img(src="http://placehold.it/1000x400/f0f0f0/?text=3" draggable="false")
           .slider-item
             img(src="http://placehold.it/1000x400/555555/?text=4" draggable="false")
+
+    br
+    h2 Custom Size Slider
+    #custom.slider-kit
+      .slider-wrapper
+        .slider-items
+          .slider-item
+            img(src="http://placehold.it/140x220/f0f0f0/?text=1" draggable="false")
+          .slider-item
+            img(src="http://placehold.it/140x220/555555/?text=2" draggable="false")
+          .slider-item
+            img(src="http://placehold.it/140x220/f0f0f0/?text=3" draggable="false")
+          .slider-item
+            img(src="http://placehold.it/140x220/555555/?text=4" draggable="false")
+          .slider-item
+            img(src="http://placehold.it/140x220/f0f0f0/?text=5" draggable="false")
+          .slider-item
+            img(src="http://placehold.it/140x220/555555/?text=6" draggable="false")
+          .slider-item
+            img(src="http://placehold.it/140x220/f0f0f0/?text=7" draggable="false")
+          .slider-item
+            img(src="http://placehold.it/140x220/555555/?text=8" draggable="false")
 
   script(src="js/index.js")

@@ -109,18 +109,23 @@ class Sliderkit {
 
   init () {
     kit.sliders.map(slider => {
-      let marginleft = window.getComputedStyle(slider.items[0])['margin-left']
+      let marginleft = window.getComputedStyle(slider.items[1])['margin-left']
       if (marginleft) {
         slider.width += parseInt(marginleft.substring(0, marginleft.length - 2))
       }
-
-      let marginright = window.getComputedStyle(slider.items[0])['margin-right']
+      let marginright = window.getComputedStyle(slider.items[1])['margin-right']
       if (marginright) {
         slider.width += parseInt(marginright.substring(0, marginright.length - 2))
       }
 
       if (slider.max * slider.width > slider.wrapper.offsetWidth) {
         slider.maxposition = (slider.max * slider.width) - (slider.wrapper.offsetWidth - slider.width)
+      }
+
+      if (marginleft && marginright) {
+        slider.maxposition -= parseInt(marginleft.substring(0, marginleft.length - 2))
+        slider.maxposition -= parseInt(marginright.substring(0, marginright.length - 2))
+        slider.itemsWrapper.style.marginLeft = `-${marginleft}`
       }
 
       this.setEventListeners(slider)
