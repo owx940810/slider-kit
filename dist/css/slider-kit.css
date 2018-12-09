@@ -137,3 +137,10 @@ body {
       -webkit-transform: scale(1.1);
           -ms-transform: scale(1.1);
               transform: scale(1.1); } }
+
+#custom .slider-item {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 140px;
+      -ms-flex: 0 0 140px;
+          flex: 0 0 140px;
+  margin: 0 10px; }
